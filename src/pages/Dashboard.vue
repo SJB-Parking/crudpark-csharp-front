@@ -29,14 +29,16 @@
     </section>
 
     <!-- Charts Section -->
-    <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+   <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <DashboardChart
+        v-if="incomeData"
         title="Ingresos por día"
         chartType="Line"
         :chartData="incomeData"
         :chartOptions="chartOptions"
       />
       <DashboardChart
+        v-if="occupancyData"
         title="Ocupación promedio"
         chartType="Bar"
         :chartData="occupancyData"
