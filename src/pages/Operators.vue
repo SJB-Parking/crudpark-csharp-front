@@ -30,18 +30,18 @@
       </thead>
       <tbody>
         <tr
-          v-for="operator in filteredOperators"
+          v-for="operator in operators"
           :key="operator.id"
           class="border-b hover:bg-gray-50"
         >
-          <td class="py-3 px-4">{{ operator.name }}</td>
+          <td class="py-3 px-4">{{ operator.fullName }}</td>
           <td class="py-3 px-4">{{ operator.email }}</td>
           <td class="py-3 px-4">
             <span
               class="px-2 py-1 rounded-full text-xs"
-              :class="operator.active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'"
+              :class="operator.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'"
             >
-              {{ operator.active ? 'Activo' : 'Inactivo' }}
+              {{ operator.isActive ? 'Activo' : 'Inactivo' }}
             </span>
           </td>
           <td class="py-3 px-4 text-center">
@@ -76,7 +76,7 @@ const searchQuery = ref('')
 const fetchOperators = async () => {
   try {
     const { data } = await api.get('/operadores')
-    operators.value = data
+    operators.value = data.data
   } catch (err) {
     console.error('Failed to fetch operators:', err)
   }

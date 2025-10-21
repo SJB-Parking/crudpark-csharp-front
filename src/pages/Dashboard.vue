@@ -12,19 +12,19 @@
       />
       <DashboardCard
         title="Ingresos del día"
-        :value="`$${metrics?.dailyIncome ?? 0}`"
+        :value="`$${Number(metrics?.todayIncome ?? 0).toLocaleString()}`"
       />
       <DashboardCard
         title="Mensualidades activas"
-        :value="metrics?.activeMonthlies ?? '—'"
+        :value="metrics?.activeSubscriptions ?? '—'"
       />
       <DashboardCard
         title="Próximas a vencer"
-        :value="metrics?.expiringMonthlies ?? '—'"
+        :value="metrics?.expiringSoon ?? '—'"
       />
       <DashboardCard
         title="Mensualidades vencidas"
-        :value="metrics?.expiredMonthlies ?? '—'"
+        :value="metrics?.expiredSubscriptions?? '—'"
       />
     </section>
 

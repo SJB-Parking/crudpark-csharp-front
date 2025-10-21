@@ -26,9 +26,9 @@
           :key="tarifa.id"
           class="border-b hover:bg-gray-50"
         >
-          <td class="py-3 px-4">{{ tarifa.type }}</td>
-          <td class="py-3 px-4">${{ tarifa.value }}</td>
-          <td class="py-3 px-4">{{ tarifa.effectiveDate }}</td>
+          <td class="py-3 px-4">{{ tarifa.rateName }}</td>
+          <td class="py-3 px-4">${{ tarifa.hourlyRate }}</td>
+          <td class="py-3 px-4">{{ new Date(tarifa.effectiveFrom).toLocaleDateString() }}</td>
           <td class="py-3 px-4 text-center">
             <button
               @click="openModal('edit', tarifa)"
@@ -52,7 +52,7 @@ const tarifas = ref([])
 
 const fetchTarifas = async () => {
   const { data } = await api.get('/tarifas')
-  tarifas.value = data
+  tarifas.value = data.data
 }
 
 onMounted(fetchTarifas)

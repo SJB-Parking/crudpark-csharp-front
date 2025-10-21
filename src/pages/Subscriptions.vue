@@ -39,15 +39,15 @@
           :key="m.id"
           class="border-b hover:bg-gray-50"
         >
-          <td class="py-3 px-4">{{ m.client }}</td>
-          <td class="py-3 px-4">{{ m.plate }}</td>
-          <td class="py-3 px-4">{{ m.expirationDate }}</td>
+          <td class="py-3 px-4">{{ m.customer.fullName }}</td>
+          <td class="py-3 px-4">{{ m.vehicles.map(v => v.licensePlate).join(', ') }}</td>
+          <td class="py-3 px-4">{{ new Date(m.endDate).toLocaleDateString() }}</td>
           <td class="py-3 px-4">
             <span
               class="px-2 py-1 rounded-full text-xs"
-              :class="statusColor(m.status)"
+              :class="statusColor(m.isActive ? 'activa' : 'vencida')"
             >
-              {{ m.status }}
+              {{ m.isActive ? 'Activa' : 'Vencida' }}
             </span>
           </td>
           <td class="py-3 px-4 text-center">
@@ -84,7 +84,7 @@ const fetchMensualidades = async () => {
     const { data } = await api.get('/mensualidades', {
       params: { filtro: filter.value },
     })
-    mensualidades.value = data
+    mensualidades.value = data.data
   } catch (err) {
     console.error('Failed to fetch mensualidades:', err)
   }
