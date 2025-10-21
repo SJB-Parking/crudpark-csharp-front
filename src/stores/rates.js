@@ -22,6 +22,47 @@ export const useRatesStore = defineStore('rates', {
         this.loading = false
       }
     },
-    // Aquí podrías agregar más acciones en el futuro (createRate, updateRate, etc.)
+    async updateRate(id, rateData) {
+      this.loading = true
+      try {
+        console.log('🔵 Updating rate:', id)
+        console.log('Rate data:', JSON.stringify(rateData, null, 2))
+        
+        const payload = {
+          hourlyRate: parseFloat(rateData.hourlyRate),
+          effectiveFrom: rateData.effectiveFrom + 'T00:00:00Z'
+        }
+        
+        console.log('Payload:', JSON.stringify(payload, null, 2))
+        const { data } = await api.put(`/tarifas/${id}`, payload)
+        
+        console.log('✅ Rate updated successfully')
+        await this.fetchTarifas()
+        return { success: true, data: data.data || data }
+      } catch (error) {
+        console.error('❌ Failed to update rate:', error)
+        console.error('Error response:', error.response?.data)
+        console.error('Error status:', error.response?.status)
+        
+        let errorMessage = 'Error desconocido'
+        
+        if (error.response?.data?.message) {
+          errorMessage = error.response.data.message
+        } else if (error.response?.data?.errors) {
+          const errors = error.response.data.errors
+          errorMessage = Object.values(errors).flat().join(', ')
+        } else if (error.response?.data) {
+          errorMessage = typeof error.response.data === 'string' 
+            ? error.response.data 
+            : JSON.stringify(error.response.data)
+        } else if (error.message) {
+          errorMessage = error.message
+        }
+        
+        return { success: false, error, message: errorMessage }
+      } finally {
+        this.loading = false
+      }
+    },
   },
 })

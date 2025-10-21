@@ -4,12 +4,21 @@
       Configuración de Tarifas
     </h1>
 
-    <button
-      @click="openModal('create')"
-      class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg mb-4"
-    >
-      Nueva Tarifa
-    </button>
+    <!-- Modal Component -->
+    <RateModal
+      :is-open="modalOpen"
+      :rate-data="selectedRate"
+      @close="closeModal"
+      @submit="handleSubmit"
+    />
+
+    <!-- Toast Notification -->
+    <Toast
+      :show="toast.show"
+      :type="toast.type"
+      :message="toast.message"
+      @close="toast.show = false"
+    />
 
     <table class="w-full border-collapse bg-white shadow rounded-lg overflow-hidden">
       <thead class="bg-gray-100 text-gray-600 text-sm uppercase">
@@ -31,7 +40,7 @@
           <td class="py-3 px-4">{{ new Date(tarifa.effectiveFrom).toLocaleDateString() }}</td>
           <td class="py-3 px-4 text-center">
             <button
-              @click="openModal('edit', tarifa)"
+              @click="openModal(tarifa)"
               class="text-blue-600 hover:underline"
             >
               Editar
@@ -45,19 +54,62 @@
 
 <script setup>
 // Tariffs management page
-import { onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 // 1. Importa el nuevo store
 import { useRatesStore } from '@/stores/rates'
+import RateModal from '@/components/Rates/RateModal.vue'
+import Toast from '@/components/common/Toast.vue'
 
 // 2. Crea una instancia del store
 const ratesStore = useRatesStore()
+
+// Modal state
+const modalOpen = ref(false)
+const selectedRate = ref(null)
+
+// Toast notification state
+const toast = ref({
+  show: false,
+  type: 'success',
+  message: '',
+})
 
 // 3. Llama a la acción del store cuando el componente se monta
 onMounted(() => {
   ratesStore.fetchTarifas()
 })
 
-const openModal = (mode, data = null) => {
-  console.log(`Open modal: ${mode}`, data)
+// Toast helper
+const showToast = (type, message) => {
+  toast.value = {
+    show: true,
+    type,
+    message,
+  }
+}
+
+const openModal = (rate) => {
+  selectedRate.value = rate
+  modalOpen.value = true
+}
+
+const closeModal = () => {
+  modalOpen.value = false
+  selectedRate.value = null
+}
+
+const handleSubmit = async (rateData) => {
+  console.log('🔵 handleSubmit called with:', rateData)
+  console.log('🔍 ratesStore.updateRate exists?', typeof ratesStore.updateRate)
+  
+  const result = await ratesStore.updateRate(rateData.id, rateData)
+  
+  if (result.success) {
+    closeModal()
+    showToast('success', '✓ Tarifa actualizada exitosamente')
+  } else {
+    const errorMsg = result.message || 'Error al actualizar la tarifa. Intente nuevamente.'
+    showToast('error', `✗ ${errorMsg}`)
+  }
 }
 </script>
