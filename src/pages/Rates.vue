@@ -22,7 +22,7 @@
       </thead>
       <tbody>
         <tr
-          v-for="tarifa in tarifas"
+          v-for="tarifa in ratesStore.tarifas"
           :key="tarifa.id"
           class="border-b hover:bg-gray-50"
         >
@@ -45,17 +45,17 @@
 
 <script setup>
 // Tariffs management page
-import { ref, onMounted } from 'vue'
-import api from '../services/api'
+import { onMounted } from 'vue'
+// 1. Importa el nuevo store
+import { useRatesStore } from '@/stores/rates'
 
-const tarifas = ref([])
+// 2. Crea una instancia del store
+const ratesStore = useRatesStore()
 
-const fetchTarifas = async () => {
-  const { data } = await api.get('/tarifas')
-  tarifas.value = data.data
-}
-
-onMounted(fetchTarifas)
+// 3. Llama a la acción del store cuando el componente se monta
+onMounted(() => {
+  ratesStore.fetchTarifas()
+})
 
 const openModal = (mode, data = null) => {
   console.log(`Open modal: ${mode}`, data)

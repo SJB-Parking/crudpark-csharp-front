@@ -35,30 +35,30 @@
       </thead>
       <tbody>
         <tr
-          v-for="m in mensualidades"
-          :key="m.id"
+          v-for="subscription in subscriptionsStore.subscriptions"
+          :key="subscription.id"
           class="border-b hover:bg-gray-50"
         >
-          <td class="py-3 px-4">{{ m.customer.fullName }}</td>
-          <td class="py-3 px-4">{{ m.vehicles.map(v => v.licensePlate).join(', ') }}</td>
-          <td class="py-3 px-4">{{ new Date(m.endDate).toLocaleDateString() }}</td>
+          <td class="py-3 px-4">{{ subscription.customer.fullName }}</td>
+          <td class="py-3 px-4">{{ subscription.vehicles.map(v => v.licensePlate).join(', ') }}</td>
+          <td class="py-3 px-4">{{ new Date(subscription.endDate).toLocaleDateString() }}</td>
           <td class="py-3 px-4">
             <span
               class="px-2 py-1 rounded-full text-xs"
-              :class="statusColor(m.isActive ? 'activa' : 'vencida')"
+              :class="statusColor(subscription.isActive ? 'activa' : 'vencida')"
             >
-              {{ m.isActive ? 'Activa' : 'Vencida' }}
+              {{ subscription.isActive ? 'Activa' : 'Vencida' }}
             </span>
           </td>
           <td class="py-3 px-4 text-center">
             <button
-              @click="openModal('edit', m)"
+              @click="openModal('edit', subscription)"
               class="text-blue-600 hover:underline mr-2"
             >
               Editar
             </button>
             <button
-              @click="deleteMensualidad(m)"
+              @click="deleteMensualidad(subscription)"
               class="text-red-600 hover:underline"
             >
               Eliminar
@@ -71,46 +71,35 @@
 </template>
 
 <script setup>
-// Subscriptions (Mensualidades) management page
-import { ref, onMounted } from 'vue'
-import api from '../services/api'
+import { computed, onMounted } from 'vue'
+import { useSubscriptionsStore } from '@/stores/subscriptions'
 
-const mensualidades = ref([])
-const filter = ref('')
+const subscriptionsStore = useSubscriptionsStore()
 
-// Fetch mensualidades
-const fetchMensualidades = async () => {
-  try {
-    const { data } = await api.get('/mensualidades', {
-      params: { filtro: filter.value },
-    })
-    mensualidades.value = data.data
-  } catch (err) {
-    console.error('Failed to fetch mensualidades:', err)
-  }
-}
+onMounted(() => {
+  subscriptionsStore.fetchSubscriptions()
+})
 
-onMounted(fetchMensualidades)
+// Propiedad computada para manejar el filtro
+const filter = computed({
+  get: () => subscriptionsStore.filter,
+  set: (value) => subscriptionsStore.setFilter(value),
+})
 
 const openModal = (mode, data = null) => {
   console.log(`Open modal: ${mode}`, data)
 }
 
-const deleteMensualidad = async (m) => {
-  await api.delete(`/mensualidades/${m.id}`)
-  fetchMensualidades()
+// Lógica mejorada para el color y texto del estado
+const statusColor = (daysRemaining) => {
+  if (daysRemaining < 0) return 'bg-red-100 text-red-700'
+  if (daysRemaining <= 3) return 'bg-yellow-100 text-yellow-700'
+  return 'bg-green-100 text-green-700'
 }
 
-const statusColor = (status) => {
-  switch (status) {
-    case 'activa':
-      return 'bg-green-100 text-green-700'
-    case 'vencida':
-      return 'bg-red-100 text-red-700'
-    case 'próxima':
-      return 'bg-yellow-100 text-yellow-700'
-    default:
-      return ''
-  }
+const getStatusText = (daysRemaining) => {
+  if (daysRemaining < 0) return 'Vencida'
+  if (daysRemaining <= 3) return 'Próxima a vencer'
+  return 'Activa'
 }
 </script>

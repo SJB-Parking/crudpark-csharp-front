@@ -4,7 +4,7 @@
   >
     <!-- Logo -->
     <div class="flex items-center gap-2 p-4 border-b border-gray-700">
-      <img src="/src/assets/LogoCrudPark.jpg" alt="Logo" class="object-contain" 
+      <img src="/src/assets/LogoCrudParkWBg.png" alt="Logo" class="object-contain"
         style="width: 80px; height: 80px;"  />
       <span class="text-base font-semibold">CrudPark</span>
     </div>

@@ -30,7 +30,7 @@
       </thead>
       <tbody>
         <tr
-          v-for="operator in operators"
+          v-for="operator in filteredOperators"
           :key="operator.id"
           class="border-b hover:bg-gray-50"
         >
@@ -65,43 +65,25 @@
 </template>
 
 <script setup>
-// Operators management page
 import { ref, computed, onMounted } from 'vue'
-import api from '../services/api'
+import { useOperatorsStore } from '@/stores/operators'
 
-const operators = ref([])
+const operatorsStore = useOperatorsStore()
 const searchQuery = ref('')
 
-// Fetch operators list
-const fetchOperators = async () => {
-  try {
-    const { data } = await api.get('/operadores')
-    operators.value = data.data
-  } catch (err) {
-    console.error('Failed to fetch operators:', err)
-  }
-}
+onMounted(() => {
+  operatorsStore.fetchOperators()
+})
 
-onMounted(fetchOperators)
-
-// Filter list by search
 const filteredOperators = computed(() => {
-  return operators.value.filter((op) =>
-    op.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+  if (!searchQuery.value) {
+    return operatorsStore.operators
+  }
+  return operatorsStore.operators.filter((op) =>
+    op.fullName.toLowerCase().includes(searchQuery.value.toLowerCase())
   )
 })
 
-// Soft delete or reactivate operator
-const toggleStatus = async (operator) => {
-  try {
-    await api.delete(`/operadores/${operator.id}`)
-    fetchOperators()
-  } catch (err) {
-    console.error('Failed to toggle operator status:', err)
-  }
-}
-
-// Modal logic placeholder
 const openModal = (mode, data = null) => {
   console.log(`Open modal: ${mode}`, data)
 }
