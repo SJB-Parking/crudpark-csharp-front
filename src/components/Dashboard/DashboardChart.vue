@@ -2,7 +2,7 @@
   <div class="bg-white p-5 rounded-2xl shadow-md">
     <h3 class="text-gray-700 text-sm font-semibold mb-4">{{ title }}</h3>
     <component
-      :is="chartType"
+      :is="chartComponent"
       :data="chartData"
       :options="chartOptions"
       class="h-72"
@@ -11,6 +11,8 @@
 </template>
 
 <script setup>
+// 1. Importa 'computed' de Vue
+import { computed } from 'vue'
 import {
   Chart as ChartJS,
   Title,
@@ -24,19 +26,12 @@ import {
 } from 'chart.js'
 import { Bar, Line } from 'vue-chartjs'
 
-// Register required Chart.js components
 ChartJS.register(
-  Title,
-  Tooltip,
-  Legend,
-  BarElement,
-  LineElement,
-  PointElement,
-  CategoryScale,
-  LinearScale
+  Title, Tooltip, Legend, BarElement, LineElement, PointElement, CategoryScale, LinearScale
 )
 
-defineProps({
+// 2. Guarda los props en una constante para usarlos
+const props = defineProps({
   title: String,
   chartType: {
     type: String,
@@ -44,5 +39,14 @@ defineProps({
   },
   chartData: Object,
   chartOptions: Object,
+})
+
+// 3. Crea una propiedad computada que devuelve el componente correcto
+const chartComponent = computed(() => {
+  if (props.chartType === 'Line') {
+    return Line
+  }
+  // Por defecto, devuelve el componente Bar
+  return Bar
 })
 </script>
