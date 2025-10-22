@@ -1,7 +1,12 @@
 <template>
-  <DefaultLayout />
+  <router-view />
+  <ToastNotification />
 </template>
 
 <script setup>
-import DefaultLayout from './layouts/DefaultLayout.vue'
+import ToastNotification from './components/UI/ToastNotification.vue'
 </script>
+
+<style>
+/* Global styles are in main.css */
+</style>
